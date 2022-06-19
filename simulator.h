@@ -4,9 +4,41 @@
 #include <stdbool.h>
 #include <math.h>
 
+// For sleep()
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
+// MUX Signals
+#define ZERO 0
+#define ONE 1
+#define X 2
+
+// ALU Signals
+#define ADD 0
+#define SUB 1
+#define MUL 2
+#define DIV 3
+#define OR  4
+#define AND 5
+#define NAND 6
+
 struct instructionMemory{
 	int readAddress;
-	int instruction;
+	char instruction[33];
+	char **instructions;
+};
+
+struct registerFile{
+	int readRegister1;
+	int readRegister2;
+	int readData1;
+	int readData2;
+	int writeRegister;
+	int writeData;
+	int registers[16]; // It holds register values in decimal
 };
 
 struct controlUnit{
@@ -24,22 +56,11 @@ struct controlUnit{
 	int LUICtr;
 };
 
-struct mux{
+struct Mux{
 	int input1;
 	int input2;
 	int signal;
 	int output;
-
-	// int decideOutput(){
-	// 	if(signal == 0){
-	// 		output = input1;
-	// 		return 1;
-	// 	}
-	// 	else{
-	// 		output = input2;
-	// 		return 2;
-	// 	}
-	// }
 };
 
 struct ALU{
@@ -50,17 +71,23 @@ struct ALU{
 	int zero;
 };
 
-struct registerFile{
-	int input1;
-	int input2;
-	int output1;
-	int output2;
-	int writeRegister;
+struct DataMemory{
+	int address;
 	int writeData;
+	int readData;
+	int data[1 << 14];
 };
 
-char *getNthLine(FILE *, int);
-long long int2Binary(int dec);	// Converts decimal to binary
+long long int2Binary(long long dec);	// Converts decimal to binary
+void int2CharBinary(long long dec, char* binary, int len);	// Converts decimal to char* binary
 char *binaryExtend(long long bin, int len, char sign);	// Etxends binary
-long long bin2Dec(char *, int);
-long long complement2s(long long bin);
+long long bin2Dec(char *, int, int sign);
+
+int Mux_getOutput(struct Mux* mux);
+int ALU_getoutput(struct ALU* alu);
+void displayRegsiters(struct registerFile *);
+void fillInstructionAndDataMemory(struct instructionMemory *, struct DataMemory *, int *memory_used, FILE *);
+int findInstructionsCount(FILE *);
+void setControls(struct controlUnit *, char *opCode);
+void displayResults(struct registerFile *, int IC, int used_memory, bool registers_flag[16]);
+char* complement2s(char *ones, int len);
