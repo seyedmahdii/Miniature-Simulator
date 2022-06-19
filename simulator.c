@@ -50,9 +50,6 @@ void main(int argc,char **argv){
 
 	// Filling Instruction memory & Data memory
 	fillInstructionAndDataMemory(IM, memory, &used_memory, machp);
-	// char x[17];
-	// strcpy(x, "1111111111111101");
-	// printf("_____Test: %d __________________\n\n\n", bin2Dec(x, 16, 0));
 										  
 	while(PC < instCount){
 		char opCode[5], rs[5], rt[5], rd[5], offset[17];
@@ -317,7 +314,7 @@ void main(int argc,char **argv){
 			displayRegsiters(RF); 
 		}
 
-		// sleep(3);
+		sleep(2);
 	}
 
 	fclose(machp);
@@ -452,7 +449,7 @@ int findInstructionsCount(FILE *inputFile){
 }
 
 void displayRegsiters(struct registerFile *RF){
-	system("clear"); // system("cls") for windows
+	// system("clear"); // system("cls") for windows
 
 	for(int i=0; i<16; i++){
 		printf("R[%d] = %d \t", i, RF->registers[i]);
